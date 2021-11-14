@@ -1,0 +1,85 @@
+name: build-docker
+
+on:
+  push:
+    branches:
+      - main
+      - dev
+    tags:
+      - v*
+
+  # pull_request:
+  #   branches:
+  #     - main
+  #     - dev
+
+env:
+  IMAGE_NAME: lite-bookkeeping-go
+  DOCKER_USERNAME: ${{secrets.DOCKER_USERNAME}}
+  DOCKER_PASSWORD: ${{secrets.DOCKER_PASSWORD}}
+
+jobs:
+  build-and-deploy:
+    environment: production
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@master
+    - name: Build image
+      run: docker build -t $IMAGE_NAME .
+    - name: Log into DockHub
+      run: docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
+    - name: Push image to DockHub
+      run: |
+        # 生成版本号
+        VERSION=${{ github.ref }}
+
+        if [[ $VERSION == refs/tags/v* ]]; then
+          VERSION=$(echo $VERSION | sed -e 's/^refs\/tags\/v//g')
+        elif [[ $VERSION == */main ]]; then
+          VERSION=latest
+        elif [[ $VERSION == */dev ]]; then
+          VERSION=dev
+        fi
+
+        echo github.ref=${{ github.ref }}
+        echo version=$VERSION
+
+        IMAGE_ID=$DOCKER_USERNAME/$IMAGE_NAME
+        docker tag $IMAGE_NAME ${IMAGE_ID}:$VERSION
+        docker push $IMAGE_ID:$VERSION
+    - name: Deploy Prodution
+      if: ${{ contains(github.ref, 'main') }}
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.HOST }}
+        username: ${{ secrets.USER }}
+        key: ${{ secrets.SSH }}
+        port: ${{ secrets.PORT }}
+        script: |
+          IMAGE_NAME=lite-bookkeeping-go
+          IMAGE_ID=${{secrets.DOCKER_USERNAME}}/$IMAGE_NAME
+          echo $IMAGE_NAME
+          echo $IMAGE_ID
+          docker stop $IMAGE_NAME
+          docker rm $IMAGE_NAME
+          docker pull $IMAGE_ID:latest
+          docker run -p ${{secrets.RUN_DEV_PORT}}:9000 -v ${{secrets.CONFIG_DEV_PATH}}:/serve/config/config.json --name $IMAGE_NAME -d $IMAGE_ID:latest
+    - name: Deploy Testing
+      if: ${{ contains(github.ref, 'dev') }}
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.HOST }}
+        username: ${{ secrets.USER }}
+        key: ${{ secrets.SSH }}
+        port: ${{ secrets.PORT }}
+        script: |
+          IMAGE_NAME=lite-bookkeeping-go
+          CONTA_NAME=$IMAGE_NAME-testing
+          IMAGE_ID=${{secrets.DOCKER_USERNAME}}/$IMAGE_NAME
+          echo $CONTA_NAME
+          echo $IMAGE_ID
+          docker stop $CONTA_NAME
+          docker rm $CONTA_NAME
+          docker pull $IMAGE_ID:dev
+          docker run -p ${{secrets.RUN_PORT}}:9000 -v ${{secrets.CONFIG_PATH}}:/serve/config/config.json --name $CONTA_NAME -d $IMAGE_ID:dev
