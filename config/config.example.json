@@ -1,0 +1,15 @@
+{
+  "mysql": {
+    "host": "",
+    "port": "",
+    "user": "",
+    "password": "",
+    "database": ""
+  },
+  "gin": {
+    "host": "0.0.0.0",
+    "port": "9000",
+    "mode": "debug"
+  },
+  "remarks": "Please FILL the settings AND change this file'name to [config.json] BEFORE run this project."
+}
