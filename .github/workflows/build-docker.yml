@@ -83,3 +83,4 @@ jobs:
           docker rm $CONTA_NAME
           docker pull $IMAGE_ID:dev
           docker run -p ${{secrets.RUN_DEV_PORT}}:9000 -v ${{secrets.CONFIG_DEV_PATH}}:/serve/config/config.json --name $CONTA_NAME -d $IMAGE_ID:dev
+
