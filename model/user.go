@@ -13,11 +13,11 @@ import "github.com/jinzhu/gorm"
 
 type User struct {
 	gorm.Model
-	Name     string `gorm:"unique_index;not null"`
-	Password string
-	Slat     string
-	Email    string
-	Mobile   string
-	IsLocked bool
-	IsActive bool
+	Name     string `gorm:"unique_index;not null;size:50"`
+	Password string `gorm:"not null;size:50"`
+	Slat     string `gorm:"not null;size:50"`
+	Email    string `gorm:"not null"`
+	Mobile   string `gorm:"not null;size:25"`
+	IsLocked bool   `gorm:"not null;default:false"`
+	IsActive bool   `gorm:"not null;default:true"`
 }

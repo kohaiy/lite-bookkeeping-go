@@ -12,5 +12,7 @@ func NewRouter() *gin.Engine {
 
 	r.GET("/", module.Index)
 
+	UseUserRouter(r)
+
 	return r
 }
