@@ -64,7 +64,7 @@ jobs:
           docker stop $IMAGE_NAME
           docker rm $IMAGE_NAME
           docker pull $IMAGE_ID:latest
-          docker run -p ${{secrets.RUN_DEV_PORT}}:9000 -v ${{secrets.CONFIG_DEV_PATH}}:/serve/config/config.json --name $IMAGE_NAME -d $IMAGE_ID:latest
+          docker run -p ${{secrets.RUN_PORT}}:9000 -v ${{secrets.CONFIG_PATH}}:/serve/config/config.json --name $IMAGE_NAME -d $IMAGE_ID:latest
     - name: Deploy Testing
       if: ${{ contains(github.ref, 'dev') }}
       uses: appleboy/ssh-action@master
@@ -82,4 +82,4 @@ jobs:
           docker stop $CONTA_NAME
           docker rm $CONTA_NAME
           docker pull $IMAGE_ID:dev
-          docker run -p ${{secrets.RUN_PORT}}:9000 -v ${{secrets.CONFIG_PATH}}:/serve/config/config.json --name $CONTA_NAME -d $IMAGE_ID:dev
+          docker run -p ${{secrets.RUN_DEV_PORT}}:9000 -v ${{secrets.CONFIG_DEV_PATH}}:/serve/config/config.json --name $CONTA_NAME -d $IMAGE_ID:dev
