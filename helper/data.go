@@ -27,7 +27,8 @@ func GenerateSlat() string {
 }
 
 type TokenPayload struct {
-	ID uint `json:"id"`
+	ID   uint   `json:"id"`
+	Slat string `json:"slat"`
 }
 
 type CustomClaims struct {

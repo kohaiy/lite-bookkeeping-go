@@ -31,7 +31,8 @@ func Login(c *gin.Context) {
 			return
 		}
 		token := helper.GenerateToken(helper.TokenPayload{
-			ID: user.ID,
+			ID:   user.ID,
+			Slat: helper.Md5(user.Slat),
 		})
 		res.Success(gin.H{
 			"id":     user.ID,
