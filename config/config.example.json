@@ -11,5 +11,6 @@
     "port": "9000",
     "mode": "debug"
   },
+  "tokenSecret": "",
   "remarks": "Please FILL the settings AND change this file'name to [config.json] BEFORE run this project."
 }

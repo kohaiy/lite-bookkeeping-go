@@ -1,9 +1,8 @@
 package user
 
 import (
-	"net/http"
-
 	"github.com/gin-gonic/gin"
+	"github.com/kohaiy/lite-bookkeeping-go/helper"
 	"github.com/kohaiy/lite-bookkeeping-go/model"
 )
 
@@ -13,32 +12,29 @@ type RegisterForm struct {
 }
 
 func Register(c *gin.Context) {
+	res := &helper.Res{}
 
 	var form RegisterForm
 	if c.ShouldBindJSON(&form) != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "请求参数错误。",
-		})
+		res.BadRequest("请求参数错误。").Get(c)
 		return
 	}
 	user := &model.User{
-		Name: form.Name, Password: form.Password, Slat: "123",
+		Name: form.Name,
 	}
 	check := 0
 	model.DB.Model(&model.User{}).Where("name=?", form.Name).Count(&check)
 	if check > 0 {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "用户名已存在。",
-		})
+		res.BadRequest("用户名已存在。").Get(c)
 		return
 	}
+	user.Slat = helper.GenerateSlat()
+	user.Password = helper.EncodePassword(form.Password, user.Slat)
 	if err := model.DB.Create(user).Error; err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error": err,
-		})
+		res.Error(err.Error()).Get(c)
 		return
 	}
-	c.JSON(http.StatusOK, gin.H{
+	res.Success(gin.H{
 		"id": user.ID,
-	})
+	}).Get(c)
 }
