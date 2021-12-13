@@ -23,6 +23,7 @@ require (
 )
 
 require (
+	github.com/aidarkhanov/nanoid/v2 v2.0.5
 	github.com/fsnotify/fsnotify v1.5.1 // indirect
 	github.com/gin-gonic/gin v1.7.4
 	github.com/golang-jwt/jwt v3.2.2+incompatible

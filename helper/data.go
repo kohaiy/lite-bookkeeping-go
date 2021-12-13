@@ -6,6 +6,7 @@ import (
 	"io"
 	"time"
 
+	"github.com/aidarkhanov/nanoid/v2"
 	"github.com/golang-jwt/jwt"
 	"github.com/spf13/viper"
 )
@@ -21,7 +22,8 @@ func EncodePassword(password string, slat string) string {
 }
 
 func GenerateSlat() string {
-	return "__TEMP__"
+	slat, _ := nanoid.New()
+	return slat
 }
 
 type TokenPayload struct {
