@@ -7,7 +7,7 @@ import (
 	"github.com/kohaiy/lite-bookkeeping-go/router"
 	"github.com/spf13/viper"
 
-	_ "github.com/jinzhu/gorm/dialects/mysql"
+	_ "gorm.io/driver/mysql"
 )
 
 func main() {
