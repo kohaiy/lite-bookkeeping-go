@@ -1,8 +1,6 @@
 package user
 
 import (
-	"fmt"
-
 	"github.com/gin-gonic/gin"
 	"github.com/kohaiy/lite-bookkeeping-go/helper"
 	"github.com/kohaiy/lite-bookkeeping-go/model"
@@ -25,7 +23,6 @@ func Login(c *gin.Context) {
 
 	if rows > 0 {
 		password := helper.Md5(helper.Md5(form.Password) + user.Slat)
-		fmt.Println(password + " " + user.Password)
 		if password != user.Password {
 			res.BadRequest("用户名或密码错误").Get(c)
 			return
