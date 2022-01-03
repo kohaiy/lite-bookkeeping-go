@@ -52,3 +52,17 @@ func GenerateToken(payload TokenPayload) string {
 	}
 	return fmt.Sprintf("%v", ss)
 }
+
+func ParseToken(tokenString string) *CustomClaims {
+	token, err := jwt.ParseWithClaims(tokenString, &CustomClaims{}, func(token *jwt.Token) (interface{}, error) {
+		return tokenSecret, nil
+	})
+	if err != nil {
+		return nil
+	}
+	if claims, ok := token.Claims.(*CustomClaims); ok && token.Valid {
+		return claims
+	} else {
+		return nil
+	}
+}

@@ -9,11 +9,11 @@ import (
 type Res struct {
 	status  int
 	code    int
-	data    gin.H
+	data    interface{}
 	message string
 }
 
-func (r *Res) Success(data gin.H) *Res {
+func (r *Res) Success(data interface{}) *Res {
 	r.Data(data).Code(0).Status(http.StatusOK)
 	return r
 }
@@ -33,7 +33,7 @@ func (r *Res) NotFound(message string) *Res {
 	return r
 }
 
-func (r *Res) Data(data gin.H) *Res {
+func (r *Res) Data(data interface{}) *Res {
 	r.data = data
 	return r
 }
