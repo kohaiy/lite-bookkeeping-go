@@ -12,6 +12,7 @@ func NewRouter() *gin.Engine {
 	r := gin.Default()
 
 	excludePaths := []string{
+		"/",
 		"/user/login",
 		"/user/register",
 	}

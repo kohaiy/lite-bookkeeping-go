@@ -33,6 +33,11 @@ func (r *Res) NotFound(message string) *Res {
 	return r
 }
 
+func (r *Res) Unauthorized(message string) *Res {
+	r.Error(message).Status(http.StatusUnauthorized)
+	return r
+}
+
 func (r *Res) Data(data interface{}) *Res {
 	r.data = data
 	return r

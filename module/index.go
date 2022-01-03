@@ -1,14 +1,11 @@
 package module
 
 import (
-	"net/http"
-
 	"github.com/gin-gonic/gin"
+	"github.com/kohaiy/lite-bookkeeping-go/helper"
 )
 
 func Index(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{
-		"code":    0,
-		"message": "啥都木有",
-	})
+	res := helper.Res{}
+	res.Message("啥都木有").Get(c)
 }
