@@ -3,6 +3,7 @@ package model
 import (
 	"time"
 
+	"github.com/kohaiy/lite-bookkeeping-go/constants"
 	"gorm.io/gorm"
 )
 
@@ -18,11 +19,12 @@ import (
 
 type Bill struct {
 	gorm.Model
-	UserId        uint      `gorm:"not null"`
-	ActionTime    time.Time `gorm:"not null"`
-	BillTypeCode  uint      `gorm:"not null"`
-	BillAccountId uint      `gorm:"not null"`
-	Amount        int       `gorm:"not null"`
-	Remarks       string    `gorm:""`
-	IsIgnore      bool      `gorm:"not null;default 0"`
+	UserId        uint               `gorm:"not null"`
+	ActionTime    time.Time          `gorm:"not null"`
+	BillTypeCode  constants.BillType `gorm:"not null"`
+	BillAccountId uint               `gorm:"not null"`
+	BillTagId     uint               `gorm:"not null"`
+	Amount        int                `gorm:"not null"`
+	Remarks       string             `gorm:""`
+	IsIgnore      bool               `gorm:"not null;default 0"`
 }

@@ -7,7 +7,5 @@ import (
 )
 
 func UseBillAccountRouter(e *gin.Engine) {
-	r := e.Group("/bill-account")
-
-	r.GET("list", billaccount.ListBillAccount)
+	e.GET("/bill-accounts", billaccount.ListBillAccount)
 }

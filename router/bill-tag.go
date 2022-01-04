@@ -7,7 +7,5 @@ import (
 )
 
 func UseBillTagRouter(e *gin.Engine) {
-	r := e.Group("/bill-tag")
-
-	r.GET("list", billtag.ListBillTag)
+	e.GET("/bill-tags", billtag.ListBillTag)
 }
