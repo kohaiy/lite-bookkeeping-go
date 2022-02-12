@@ -1,6 +1,8 @@
 package middleware
 
 import (
+	"fmt"
+
 	"github.com/gin-gonic/gin"
 	"github.com/kohaiy/lite-bookkeeping-go/helper"
 	"github.com/kohaiy/lite-bookkeeping-go/model"
@@ -8,6 +10,18 @@ import (
 
 func UseAuth(excludePaths []string) gin.HandlerFunc {
 	return func(c *gin.Context) {
+
+		clientIP := c.GetHeader("HTTP_CF_CONNECTING_IP")
+		if clientIP == "" {
+			clientIP = c.GetHeader("REMOTE_ADDR")
+		}
+		if clientIP == "" {
+			clientIP = c.ClientIP()
+		}
+		fmt.Println("HTTP_CF_CONNECTING_IP: " + c.GetHeader("HTTP_CF_CONNECTING_IP") + " / " + c.ClientIP())
+		fmt.Println("REMOTE_ADDR: " + c.GetHeader("REMOTE_ADDR") + " / " + c.ClientIP())
+		c.Set("ClientIP", clientIP)
+
 		for _, p := range excludePaths {
 			if c.Request.URL.Path == p {
 				c.Next()

@@ -31,12 +31,14 @@ func Login(c *gin.Context) {
 			ID:   user.ID,
 			Slat: helper.Md5(user.Slat),
 		})
+		clientIP := c.MustGet("ClientIP").(string)
 		res.Success(gin.H{
-			"id":     user.ID,
-			"name":   user.Name,
-			"email":  user.Email,
-			"mobile": user.Mobile,
-			"token":  token,
+			"id":       user.ID,
+			"name":     user.Name,
+			"email":    user.Email,
+			"mobile":   user.Mobile,
+			"token":    token,
+			"clientIp": clientIP,
 		}).Message("Login success").Get(c)
 		return
 	}
