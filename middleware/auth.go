@@ -18,8 +18,9 @@ func UseAuth(excludePaths []string) gin.HandlerFunc {
 		if clientIP == "" {
 			clientIP = c.ClientIP()
 		}
-		fmt.Println("HTTP_CF_CONNECTING_IP: " + c.GetHeader("HTTP_CF_CONNECTING_IP") + " / " + c.ClientIP())
-		fmt.Println("REMOTE_ADDR: " + c.GetHeader("REMOTE_ADDR") + " / " + c.ClientIP())
+		fmt.Println("[" + clientIP + "]Host: " + c.GetHeader("Host"))
+		fmt.Println("[" + clientIP + "]Referer: " + c.GetHeader("Referer"))
+		fmt.Println("[" + clientIP + "]User-Agent: " + c.GetHeader("User-Agent"))
 		c.Set("ClientIP", clientIP)
 
 		for _, p := range excludePaths {

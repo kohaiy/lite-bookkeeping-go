@@ -50,6 +50,7 @@ func (r *Res) Code(code int) *Res {
 
 func (r *Res) Status(status int) *Res {
 	r.status = status
+	r.code = status
 	return r
 }
 
