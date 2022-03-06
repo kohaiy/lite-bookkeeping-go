@@ -12,5 +12,8 @@
     "mode": "debug"
   },
   "tokenSecret": "",
+  "uniAuthUrl": "",
+  "uniAuthClientId": "",
+  "uniAuthSecret": "",
   "remarks": "Please FILL the settings AND change this file'name to [config.json] BEFORE run this project."
 }

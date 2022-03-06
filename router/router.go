@@ -22,7 +22,9 @@ func NewRouter() *gin.Engine {
 		"/",
 		"/apis",
 		"/user/login",
+		"/user/login/oauth",
 		"/user/register",
+		"/config/common",
 	}
 	r.Use(middleware.UseAuth(excludePaths))
 
@@ -32,6 +34,7 @@ func NewRouter() *gin.Engine {
 	UseBillRouter(r)
 	UseBillTagRouter(r)
 	UseBillAccountRouter(r)
+	UseConfigRouter(r)
 
 	rawRoutes := r.Routes()
 	routes := make([]RouteInfo, len(rawRoutes))

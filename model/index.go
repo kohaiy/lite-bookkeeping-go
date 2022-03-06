@@ -36,6 +36,7 @@ func ConnectDB(connectLink string) error {
 func autoMigrate() {
 	// 自动迁移表结构
 	DB.AutoMigrate(&User{})
+	DB.AutoMigrate(&UserOauth{})
 	DB.AutoMigrate(&BillTag{})
 	DB.AutoMigrate(&Bill{})
 	DB.AutoMigrate(&BillAccount{})

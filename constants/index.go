@@ -15,3 +15,9 @@ const (
 	BAT_CARD  BillAccountType = 2 // 银行卡
 	BAT_IDEAL BillAccountType = 3 // 虚拟货币
 )
+
+type OauthType uint
+
+const (
+	OT_UNIAUTH OauthType = 1
+)

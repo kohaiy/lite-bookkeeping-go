@@ -60,6 +60,10 @@ func (r *Res) Message(message string) *Res {
 }
 
 func (r Res) Get(c *gin.Context) {
+	if r.code == http.StatusOK {
+		c.JSON(r.status, r.data)
+		return
+	}
 	c.JSON(r.status, gin.H{
 		"code":    r.code,
 		"data":    r.data,
