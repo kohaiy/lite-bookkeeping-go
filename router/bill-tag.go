@@ -8,4 +8,5 @@ import (
 
 func UseBillTagRouter(e *gin.Engine) {
 	e.GET("/bill-tags", billtag.ListBillTag)
+	e.POST("/bill-tag", billtag.AddBillTag)
 }
