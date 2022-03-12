@@ -12,6 +12,7 @@
     "mode": "debug"
   },
   "tokenSecret": "",
+  "tokenExpiredAt": 24,
   "uniAuthUrl": "",
   "uniAuthClientId": "",
   "uniAuthSecret": "",
