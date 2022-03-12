@@ -36,13 +36,12 @@ type CustomClaims struct {
 	TokenPayload
 }
 
-var tokenSecret = []byte(viper.GetString("tokenSecret"))
-var tokenExpiredAt = viper.GetInt64("tokenExpiredAt")
-
 func GenerateToken(payload TokenPayload) string {
+	tokenSecret := []byte(viper.GetString("tokenSecret"))
+	tokenExpiredAt := viper.GetDuration("tokenExpiredAt")
 	claims := CustomClaims{
 		jwt.StandardClaims{
-			ExpiresAt: time.Now().Add(time.Hour * time.Duration(tokenExpiredAt)).Unix(),
+			ExpiresAt: time.Now().Add(time.Hour * tokenExpiredAt).Unix(),
 		},
 		payload,
 	}
@@ -55,6 +54,7 @@ func GenerateToken(payload TokenPayload) string {
 }
 
 func ParseToken(tokenString string) *CustomClaims {
+	tokenSecret := []byte(viper.GetString("tokenSecret"))
 	token, err := jwt.ParseWithClaims(tokenString, &CustomClaims{}, func(token *jwt.Token) (interface{}, error) {
 		return tokenSecret, nil
 	})

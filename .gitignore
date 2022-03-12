@@ -16,3 +16,4 @@
 
 config/config.json
 .DS_Store
+__debug_bin
