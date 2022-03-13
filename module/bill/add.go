@@ -6,6 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/kohaiy/lite-bookkeeping-go/helper"
 	"github.com/kohaiy/lite-bookkeeping-go/model"
+	"gorm.io/gorm"
 )
 
 type BillAddForm struct {
@@ -48,7 +49,16 @@ func AddBill(c *gin.Context) {
 		Remarks:       form.Remarks,
 		IsIgnore:      form.IsIgnore,
 	}
-	if err := model.DB.Create(bill).Error; err != nil {
+	if err := model.DB.Transaction(func(tx *gorm.DB) error {
+		if err := tx.Create(bill).Error; err != nil {
+			return err
+		}
+		billTag.Order += 1
+		if err := tx.Save(billTag).Error; err != nil {
+			return err
+		}
+		return nil
+	}); err != nil {
 		res.Error(err.Error()).Get(c)
 		return
 	}

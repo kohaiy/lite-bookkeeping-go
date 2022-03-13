@@ -17,7 +17,10 @@ func ListBillTag(c *gin.Context) {
 	res := &helper.Res{}
 	userId := c.MustGet("UserId").(uint)
 	billTags := []model.BillTag{}
-	model.DB.Where("user_id = ?", userId).Order("id").Find(&billTags)
+	if err := model.DB.Where("user_id = ?", userId).Order("`order` DESC").Order("id").Find(&billTags).Error; err != nil {
+		res.Error(err.Error()).Get(c)
+		return
+	}
 	formatBillTags := make([]BillTagVo, len(billTags))
 	for index, tag := range billTags {
 		formatBillTags[index] = BillTagVo{

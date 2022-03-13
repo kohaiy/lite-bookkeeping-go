@@ -17,4 +17,5 @@ type BillTag struct {
 	BillTypeCode constants.BillType `gorm:"not null"`
 	Name         string             `gorm:"not null"`
 	Icon         string             `gorm:""`
+	Order        uint               `gorm:""`
 }
