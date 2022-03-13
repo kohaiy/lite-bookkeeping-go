@@ -22,13 +22,17 @@ func AddBillTag(c *gin.Context) {
 	if !helper.ValidateJSON(&form, c) {
 		return
 	}
-
 	billTag := &model.BillTag{
 		UserId:       userId,
 		BillTypeCode: form.BillTypeCode,
 		Name:         form.Name,
 		Icon:         form.Icon,
 	}
+	if model.DB.Where("LOWER(name)=LOWER(?)", form.Name).Where("user_id=?", userId).Find(billTag).RowsAffected > 0 {
+		res.Error("标签名称已存在").Get(c)
+		return
+	}
+
 	if err := model.DB.Create(billTag).Error; err != nil {
 		res.Error(err.Error()).Get(c)
 		return
