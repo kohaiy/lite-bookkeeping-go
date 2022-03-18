@@ -11,3 +11,13 @@ func ValidateJSON(obj interface{}, c *gin.Context) bool {
 	}
 	return true
 }
+
+func ValidateQuery(obj interface{}, c *gin.Context) bool {
+	res := Res{}
+	if err := c.ShouldBindQuery(obj); err != nil {
+		e := err.Error()
+		res.BadRequest("请求参数错误。").Data(e).Get(c)
+		return false
+	}
+	return true
+}

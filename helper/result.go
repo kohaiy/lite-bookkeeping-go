@@ -38,6 +38,11 @@ func (r *Res) Unauthorized(message string) *Res {
 	return r
 }
 
+func (r *Res) ServerError(err error) *Res {
+	r.Error(err.Error()).Code(http.StatusInternalServerError).Status(http.StatusInternalServerError)
+	return r
+}
+
 func (r *Res) Data(data interface{}) *Res {
 	r.data = data
 	return r
