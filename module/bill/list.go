@@ -9,6 +9,11 @@ import (
 	"github.com/kohaiy/lite-bookkeeping-go/model"
 )
 
+type BillsSearchForm struct {
+	StartDate time.Time `form:"startDate"`
+	EndDate   time.Time `form:"endDate"`
+}
+
 type BillVo struct {
 	ID              uint               `json:"id"`
 	Amount          int                `json:"amount"`
@@ -25,9 +30,23 @@ type BillVo struct {
 func ListBills(c *gin.Context) {
 	res := helper.Res{}
 	userId := c.MustGet("UserId").(uint)
+	var form BillsSearchForm
+	if !helper.ValidateQuery(&form, c) {
+		return
+	}
 
 	bills := []model.Bill{}
-	model.DB.Where("user_id = ?", userId).Order("action_time DESC").Find(&bills)
+	query := model.DB.Where("user_id = ?", userId)
+	if (form.StartDate != time.Time{}) {
+		query = query.Where("action_time >= ?", form.StartDate)
+	}
+	if (form.EndDate != time.Time{}) {
+		query = query.Where("action_time <= ?", form.EndDate)
+	}
+	if err := query.Order("action_time DESC").Find(&bills).Error; err != nil {
+		res.ServerError(err).Get(c)
+		return
+	}
 	formatBills := make([]BillVo, len(bills))
 	for index, bill := range bills {
 		billAccount := model.BillAccount{}
