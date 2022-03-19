@@ -21,3 +21,13 @@ func ValidateQuery(obj interface{}, c *gin.Context) bool {
 	}
 	return true
 }
+
+func ValidateUri(obj interface{}, c *gin.Context) bool {
+	res := Res{}
+	if err := c.ShouldBindUri(obj); err != nil {
+		e := err.Error()
+		res.BadRequest("请求参数错误。").Data(e).Get(c)
+		return false
+	}
+	return true
+}
