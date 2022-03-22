@@ -1,20 +1,18 @@
 package user
 
 import (
-	"bytes"
-	"encoding/json"
 	"fmt"
-	"io/ioutil"
-	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/kohaiy/lite-bookkeeping-go/constants"
 	"github.com/kohaiy/lite-bookkeeping-go/helper"
+	"github.com/kohaiy/lite-bookkeeping-go/model"
 	"github.com/spf13/viper"
 )
 
 type LoginOAuthForm struct {
-	Type string `form:"type" binding:"required"`
-	Code string `form:"code" binding:"required"`
+	Type constants.OauthType `form:"type" binding:"required"`
+	Code string              `form:"code" binding:"required"`
 }
 
 type AccessTokenJSON struct {
@@ -33,31 +31,19 @@ func LoginOAuth(c *gin.Context) {
 		res.BadRequest("请求参数错误。").Get(c)
 		return
 	}
-	clientSecret := viper.GetString("uniAuthSecret")
-	uniAuthClientId := viper.GetString("uniAuthClientId")
-	data := make(map[string]interface{})
-	data["clientId"] = uniAuthClientId
-	data["clientSecret"] = clientSecret
-	data["code"] = form.Code
-	bytesData, _ := json.Marshal(data)
-	resp, _ := http.Post("https://testing-auth.kohai.dev/api/oauth/access-token", "application/json", bytes.NewReader(bytesData))
-	defer resp.Body.Close()
-	body, _ := ioutil.ReadAll(resp.Body)
-	accessTokenJSON := &AccessTokenJSON{}
-	json.Unmarshal(body, accessTokenJSON)
-	fmt.Println(accessTokenJSON)
 
-	if accessTokenJSON.AccessToken == "" {
-		res.BadRequest("授权登录失败，请重试").Get(c)
+	accessToken, err := helper.GetUniAuthAccessToken(form.Code)
+	if err != nil {
+		res.BadRequest(err.Error()).Get(c)
 		return
 	}
 
-	res2, _ := http.Get("https://testing-auth.kohai.dev/api/user?accessToken=" + accessTokenJSON.AccessToken)
-	defer res2.Body.Close()
-	body2, _ := ioutil.ReadAll(res2.Body)
-
 	userInfo := &UserInfo{}
-	json.Unmarshal(body2, userInfo)
+	uniAuthBaseUrl := viper.GetString("uniAuthBaseUrl")
+	if err := helper.HttpGetJSON(uniAuthBaseUrl+"/api/user?accessToken="+accessToken, userInfo); err != nil {
+		res.BadRequest(err.Error()).Get(c)
+		return
+	}
 
 	if userInfo.OpenId == "" {
 		res.BadRequest("授权登录失败，请重试").Get(c)
@@ -65,32 +51,44 @@ func LoginOAuth(c *gin.Context) {
 	}
 
 	fmt.Println(userInfo)
-	res.Success(userInfo).Get(c)
-	// userOauth := &model.UserOauth{}
-	// rows := model.DB.Where("code")
-	// user := &model.User{}
-	// rows := model.DB.Where("name=?", form.Name).Find(&user).RowsAffected
+	userOauth := &model.UserOauth{}
+	if rows := model.DB.Where("code=?", userInfo.OpenId).Find(userOauth).RowsAffected; rows == 0 {
+		keyVal := &model.KeyVal{
+			Key:       "user_oauth_" + fmt.Sprint(form.Type) + "_" + form.Code,
+			Val:       accessToken,
+			ExpiredAt: helper.GetNowTime().Add(constants.UserOauthExpiredAt),
+		}
+		if err := model.DB.Save(keyVal).Error; err != nil {
+			res.BadRequest(err.Error()).Get(c)
+			return
+		}
+		res.Success(gin.H{
+			"isBind": false,
+		}).Get(c)
+		return
+	}
 
-	// if rows > 0 {
-	// 	password := helper.Md5(helper.Md5(form.Password) + user.Slat)
-	// 	if password != user.Password {
-	// 		res.BadRequest("用户名或密码错误").Get(c)
-	// 		return
-	// 	}
-	// 	token := helper.GenerateToken(helper.TokenPayload{
-	// 		ID:   user.ID,
-	// 		Slat: helper.Md5(user.Slat),
-	// 	})
-	// 	clientIP := c.MustGet("ClientIP").(string)
-	// 	res.Success(gin.H{
-	// 		"id":       user.ID,
-	// 		"name":     user.Name,
-	// 		"email":    user.Email,
-	// 		"mobile":   user.Mobile,
-	// 		"token":    token,
-	// 		"clientIp": clientIP,
-	// 	}).Message("Login success").Get(c)
-	// 	return
-	// }
-	// res.BadRequest("用户名或密码错误").Get(c)
+	user := &model.User{}
+	rows := model.DB.Where("id=?", userOauth.UserId).Find(&user).RowsAffected
+
+	if rows > 0 {
+		token := helper.GenerateToken(helper.TokenPayload{
+			ID:   user.ID,
+			Slat: helper.Md5(user.Slat),
+		})
+		clientIP := c.MustGet("ClientIP").(string)
+		res.Success(gin.H{
+			"isBind": true,
+			"data": gin.H{
+				"id":       user.ID,
+				"name":     user.Name,
+				"email":    user.Email,
+				"mobile":   user.Mobile,
+				"token":    token,
+				"clientIp": clientIP,
+			},
+		}).Message("Login success").Get(c)
+		return
+	}
+	res.BadRequest("用户名不存在").Get(c)
 }

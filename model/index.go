@@ -40,4 +40,5 @@ func autoMigrate() {
 	DB.AutoMigrate(&BillTag{})
 	DB.AutoMigrate(&Bill{})
 	DB.AutoMigrate(&BillAccount{})
+	DB.AutoMigrate(&KeyVal{})
 }

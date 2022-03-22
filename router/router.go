@@ -23,6 +23,7 @@ func NewRouter() *gin.Engine {
 		"/apis",
 		"/user/login",
 		"/user/login/oauth",
+		"/user/bind/oauth",
 		"/user/register",
 		"/config/common",
 	}

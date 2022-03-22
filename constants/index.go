@@ -1,5 +1,9 @@
 package constants
 
+import "time"
+
+var UserOauthExpiredAt = time.Minute * 5
+
 type BillType uint
 
 const (

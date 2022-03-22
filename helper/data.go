@@ -67,3 +67,7 @@ func ParseToken(tokenString string) *CustomClaims {
 		return nil
 	}
 }
+
+func GetNowTime() time.Time {
+	return time.Now()
+}
